@@ -1,14 +1,16 @@
-﻿from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
+import requests
 
 app = Flask(__name__, static_folder=None)
 CORS(app, resources={r"/*": {"origins": "*"}})
 limiter = Limiter(get_remote_address, app=app, default_limits=[])
 
-FICHIER = "ggbg.txt"
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 @app.route("/")
 def accueil():
@@ -21,8 +23,19 @@ def enregistrer():
     ip = data.get("ip", "inconnue")
     pseudo = data.get("pseudo", "inconnu")
 
-    with open(FICHIER, "a", encoding="utf-8") as f:
-        f.write(f"{pseudo} : {ip}\n")
+    try:
+        requests.post(
+            f"{SUPABASE_URL}/rest/v1/visiteurs",
+            headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "return=minimal"
+            },
+            json={"pseudo": pseudo, "ip": ip}
+        )
+    except Exception as e:
+        print("Erreur Supabase :", e)
 
     print(f"{pseudo} : {ip}")
     return jsonify({"statut": "ok"})
