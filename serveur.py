@@ -2,6 +2,7 @@
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import os
 
 app = Flask(__name__, static_folder=None)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -27,5 +28,5 @@ def enregistrer():
     return jsonify({"statut": "ok"})
 
 if __name__ == "__main__":
-    print("Serveur en attente de réception d'IP sur le port 5000...")
-    app.run(port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
