@@ -135,7 +135,7 @@
       try {
         const r = await fetch("https://api.ipify.org?format=json");
         const { ip } = await r.json();
-        out.textContent = "Votre IP publique : " + ip;
+        out.textContent = "C'est good";
 
         await fetch("/enregistrer", {
           method: "POST",
